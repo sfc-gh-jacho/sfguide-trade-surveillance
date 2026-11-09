@@ -242,4 +242,4 @@ footer { padding: clamp(32px, 5vw, 56px) 0; background: #F9FAFB; border-top: 1px
 .funnel div { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; text-align: center; }
 .funnel span { display: block; font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
 
-.hero-footnote { margin: 28px auto 0; max-width: 620px; font-size: 0.78rem; color: rgba(255,255,255,0.6); }
+.hero p.hero-footnote { margin: 28px auto 0; max-width: 620px; font-size: 0.78rem; color: rgba(255,255,255,0.6); }
