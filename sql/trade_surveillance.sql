@@ -28,7 +28,24 @@
 -- STEP 1: SETUP
 -- ============================================================================
 
-USE ROLE ACCOUNTADMIN;
+-- Choose the role that runs the demo:
+--   'ACCOUNTADMIN'    - simplest, for sandbox accounts
+--   'SURV_DEMO_ROLE'  - least privilege; create it once with the block below
+SET demo_role = 'ACCOUNTADMIN';
+
+-- OPTIONAL: least-privilege demo role. An administrator runs this ONCE,
+-- then set demo_role = 'SURV_DEMO_ROLE' above.
+-- USE ROLE ACCOUNTADMIN;
+-- CREATE ROLE IF NOT EXISTS SURV_DEMO_ROLE COMMENT = 'Runs the trade surveillance demo';
+-- GRANT CREATE DATABASE  ON ACCOUNT TO ROLE SURV_DEMO_ROLE;  -- demo database (owned by this role)
+-- GRANT CREATE WAREHOUSE ON ACCOUNT TO ROLE SURV_DEMO_ROLE;  -- XSMALL warehouse for queries + Dynamic Table
+-- GRANT CREATE ROLE      ON ACCOUNT TO ROLE SURV_DEMO_ROLE;  -- Step 12 only (analyst/reviewer roles)
+-- SET my_user = CURRENT_USER();
+-- GRANT ROLE SURV_DEMO_ROLE TO USER IDENTIFIER($my_user);
+-- Skipping Step 12? Leave out CREATE ROLE. To avoid CREATE WAREHOUSE, grant
+-- USAGE on an existing warehouse and replace SURV_WH below with it.
+
+USE ROLE IDENTIFIER($demo_role);
 
 CREATE WAREHOUSE IF NOT EXISTS SURV_WH
     WAREHOUSE_SIZE = XSMALL AUTO_SUSPEND = 60 AUTO_RESUME = TRUE INITIALLY_SUSPENDED = TRUE;
@@ -496,12 +513,12 @@ ALTER DYNAMIC TABLE SURV_ALERTS_LIVE SUSPEND;
 
 CREATE ROLE IF NOT EXISTS SURV_ANALYST;
 CREATE ROLE IF NOT EXISTS SURV_REVIEWER;
-GRANT ROLE SURV_ANALYST  TO ROLE ACCOUNTADMIN;
-GRANT ROLE SURV_REVIEWER TO ROLE ACCOUNTADMIN;
+GRANT ROLE SURV_ANALYST  TO ROLE IDENTIFIER($demo_role);
+GRANT ROLE SURV_REVIEWER TO ROLE IDENTIFIER($demo_role);
 
 CREATE OR REPLACE MASKING POLICY surv_mask_id AS (val STRING) RETURNS STRING ->
     CASE
-        WHEN CURRENT_ROLE() IN ('ACCOUNTADMIN', 'SURV_ANALYST') THEN val
+        WHEN CURRENT_ROLE() IN ('ACCOUNTADMIN', 'SURV_DEMO_ROLE', 'SURV_ANALYST') THEN val
         ELSE 'ID_' || UPPER(LEFT(SHA2(val), 8))
     END;
 
@@ -530,16 +547,19 @@ USE ROLE SURV_REVIEWER;
 SELECT alert_id, rule, trader_id, account_id, ticker
 FROM SURV_DEMO_DB.SURVEILLANCE.SURV_ALERT_QUEUE ORDER BY alert_id LIMIT 5;
 
-USE ROLE ACCOUNTADMIN;
+USE ROLE IDENTIFIER($demo_role);
 
 -- [step:cleanup]
 -- ============================================================================
 -- STEP 13: CLEANUP (Optional - uncomment to remove demo objects)
 -- ============================================================================
 
--- USE ROLE ACCOUNTADMIN;
+-- USE ROLE IDENTIFIER($demo_role);
 -- DROP DATABASE IF EXISTS SURV_DEMO_DB;     -- tables, views, Dynamic Table, policy
 -- DROP WAREHOUSE IF EXISTS SURV_WH;
 -- DROP ROLE IF EXISTS SURV_ANALYST;
 -- DROP ROLE IF EXISTS SURV_REVIEWER;
--- UNSET (case_account, case_ticker, case_start, case_end);
+-- UNSET (case_account, case_ticker, case_start, case_end, demo_role);
+-- If you created the least-privilege role, an administrator removes it:
+-- USE ROLE ACCOUNTADMIN;
+-- DROP ROLE IF EXISTS SURV_DEMO_ROLE;

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Trade Surveillance in Snowflake — Snowflake Horizon Guide</title>
   <meta name="description" content="Detect wash trading, spoofing, front-running and marking the close in SQL with MATCH_RECOGNIZE, window functions and Dynamic Tables." />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="vendor/prism/prism-tomorrow.min.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -54,8 +54,9 @@
         <div class="hero-stat"><div class="hero-stat-val">~25 min</div><div class="hero-stat-label">Time to Complete</div></div>
         <div class="hero-stat"><div class="hero-stat-val">200K</div><div class="hero-stat-label">Orders Scanned</div></div>
         <div class="hero-stat"><div class="hero-stat-val">4</div><div class="hero-stat-label">Detection Rules</div></div>
-        <div class="hero-stat"><div class="hero-stat-val">12</div><div class="hero-stat-label">Alerts, 0 False Positives</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">12</div><div class="hero-stat-label">Planted Cases Found*</div></div>
       </div>
+      <p class="hero-footnote">* All 12 alerts are cases deliberately planted in synthetic data. This shows how the rules work. It is not a detection-rate or false-positive claim.</p>
     </div>
   </header>
 
@@ -103,7 +104,7 @@
         </div>
         <ul class="checklist reveal">
           <li><strong>Any Snowflake edition</strong> for the detection steps. The optional reviewer masking step (12) needs <strong>Enterprise Edition</strong>.</li>
-          <li><strong>ACCOUNTADMIN</strong>, or <code>&lt;YOUR_ROLE&gt;</code> with CREATE DATABASE, CREATE WAREHOUSE and CREATE ROLE on the account.</li>
+          <li><strong>A role to run it.</strong> ACCOUNTADMIN is simplest in a sandbox. For regulated environments, the top of Step 1 includes a <strong>least-privilege option</strong>: an administrator creates <code>SURV_DEMO_ROLE</code> once with only CREATE DATABASE, CREATE WAREHOUSE and (for Step 12) CREATE ROLE. You then set <code>demo_role</code> to that role on the first line of the script.</li>
           <li><strong>One Snowsight worksheet, run top to bottom.</strong> The script creates its own <code>SURV_DEMO_DB</code> database and <code>SURV_WH</code> warehouse and changes nothing else.</li>
           <li><strong>A few minutes of XSMALL compute</strong>, a fraction of one credit for a full run.</li>
         </ul>
@@ -207,6 +208,7 @@
         <div class="step reveal">
           <div class="step-head"><div class="deploy-num">9</div><div><div class="section-label">Step 9</div><h2>The Consolidated Alert Queue</h2></div></div>
           <p>One view unions the four rules into a single queue with a stable alert ID, a severity score and an explanation written for a human reviewer. All 200,000 orders reduce to 12 alerts, every planted case is caught, and none of the alerts comes from background noise.</p>
+          <div class="callout"><strong>Not a performance claim.</strong> The 12 alerts are the 12 cases deliberately planted in synthetic data, and the background flow was generated so it can't trip any rule. On real order flow these rules will produce false positives and need tuning, backtesting and model validation like any surveillance logic.</div>
           <div class="code-wrap" data-step="alerts"></div>
           <h3 class="table-title">Signal vs. noise <span class="real-badge">Real run output</span></h3>
           <div class="results" data-results="funnel"></div>
@@ -311,7 +313,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p class="footer-disclaimer">All traders, accounts, tickers (TKR01–TKR25) and trades are synthetic. The rules, thresholds and severity scores are illustrative. They are not production surveillance logic or regulatory guidance. This site has no connection to any Snowflake account.</p>
+        <p class="footer-disclaimer">Code licensed under <a href="https://github.com/sfc-gh-jacho/sfguide-trade-surveillance/blob/main/LICENSE">Apache 2.0</a>. All traders, accounts, tickers (TKR01–TKR25) and trades are synthetic. The rules, thresholds and severity scores are illustrative. They are not production surveillance logic or regulatory guidance. This site has no connection to any Snowflake account.</p>
         <span class="snow-badge">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="22"/><line x1="3.3" y1="7" x2="20.7" y2="17"/><line x1="3.3" y1="17" x2="20.7" y2="7"/></svg>
           Built on Snowflake Horizon
@@ -320,8 +322,8 @@
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+  <script src="vendor/prism/prism.min.js"></script>
+  <script src="vendor/prism/prism-sql.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
