@@ -1,0 +1,555 @@
+{
+  "_note": "Captured from a real end-to-end run of sql/trade_surveillance.sql on synthetic data. Tickers, traders and accounts are fictional. Thresholds and severity scores are illustrative.",
+  "totals": {
+    "orders": 200055,
+    "cancelled": 30258,
+    "executions": 169797
+  },
+  "blotter": [
+    {
+      "order_id": 192361,
+      "time": "10:47:45.236",
+      "trader": "T029",
+      "account": "A0109",
+      "ticker": "TKR05",
+      "side": "SELL",
+      "qty": 1700,
+      "price": 57.34,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 108876,
+      "time": "10:47:46.507",
+      "trader": "T040",
+      "account": "A0120",
+      "ticker": "TKR05",
+      "side": "SELL",
+      "qty": 1000,
+      "price": 57.67,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 76234,
+      "time": "10:47:47.268",
+      "trader": "T039",
+      "account": "A0119",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 1300,
+      "price": 57.52,
+      "status": "CANCELLED"
+    },
+    {
+      "order_id": 112154,
+      "time": "10:47:50.686",
+      "trader": "T030",
+      "account": "A0070",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 700,
+      "price": 57.79,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 61134,
+      "time": "10:47:50.794",
+      "trader": "T030",
+      "account": "A0070",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 1200,
+      "price": 57.6,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 114912,
+      "time": "10:47:52.215",
+      "trader": "T035",
+      "account": "A0075",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 1300,
+      "price": 57.61,
+      "status": "CANCELLED"
+    },
+    {
+      "order_id": 104701,
+      "time": "10:47:54.526",
+      "trader": "T034",
+      "account": "A0074",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 1300,
+      "price": 57.42,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 153018,
+      "time": "10:47:59.585",
+      "trader": "T012",
+      "account": "A0052",
+      "ticker": "TKR05",
+      "side": "SELL",
+      "qty": 1500,
+      "price": 57.54,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 900101,
+      "time": "10:48:00",
+      "trader": "T007",
+      "account": "A0007",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 15000,
+      "price": 57.45,
+      "status": "CANCELLED"
+    },
+    {
+      "order_id": 131124,
+      "time": "10:48:01.381",
+      "trader": "T030",
+      "account": "A0070",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 400,
+      "price": 57.4,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 900102,
+      "time": "10:48:02",
+      "trader": "T007",
+      "account": "A0007",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 15000,
+      "price": 57.44,
+      "status": "CANCELLED"
+    },
+    {
+      "order_id": 166025,
+      "time": "10:48:02.033",
+      "trader": "T021",
+      "account": "A0061",
+      "ticker": "TKR05",
+      "side": "SELL",
+      "qty": 1100,
+      "price": 57.26,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 24494,
+      "time": "10:48:03.791",
+      "trader": "T038",
+      "account": "A0038",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 1300,
+      "price": 57.39,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 900103,
+      "time": "10:48:04",
+      "trader": "T007",
+      "account": "A0007",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 20000,
+      "price": 57.43,
+      "status": "CANCELLED"
+    },
+    {
+      "order_id": 193366,
+      "time": "10:48:06.661",
+      "trader": "T022",
+      "account": "A0102",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 600,
+      "price": 57.46,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 176198,
+      "time": "10:48:10.224",
+      "trader": "T014",
+      "account": "A0014",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 1900,
+      "price": 57.3,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 71212,
+      "time": "10:48:10.759",
+      "trader": "T039",
+      "account": "A0079",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 700,
+      "price": 57.24,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 94193,
+      "time": "10:48:11.847",
+      "trader": "T026",
+      "account": "A0026",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 1100,
+      "price": 57.6,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 900104,
+      "time": "10:48:13",
+      "trader": "T007",
+      "account": "A0007",
+      "ticker": "TKR05",
+      "side": "SELL",
+      "qty": 3000,
+      "price": 57.55,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 7503,
+      "time": "10:48:17.488",
+      "trader": "T008",
+      "account": "A0088",
+      "ticker": "TKR05",
+      "side": "BUY",
+      "qty": 200,
+      "price": 57.64,
+      "status": "FILLED"
+    },
+    {
+      "order_id": 110606,
+      "time": "10:48:18.621",
+      "trader": "T013",
+      "account": "A0013",
+      "ticker": "TKR05",
+      "side": "SELL",
+      "qty": 500,
+      "price": 57.58,
+      "status": "FILLED"
+    }
+  ],
+  "queue": [
+    {
+      "alert_id": "SPF-002",
+      "rule": "SPOOFING",
+      "severity": 96,
+      "trader": "T015",
+      "ticker": "TKR09",
+      "time": "12:31:10",
+      "explanation": "4 SELL orders totalling 48000 shares cancelled within seconds, then a 2500-share BUY filled 11s after the first order"
+    },
+    {
+      "alert_id": "SPF-001",
+      "rule": "SPOOFING",
+      "severity": 92,
+      "trader": "T007",
+      "ticker": "TKR05",
+      "time": "10:48:00",
+      "explanation": "3 BUY orders totalling 50000 shares cancelled within seconds, then a 3000-share SELL filled 13s after the first order"
+    },
+    {
+      "alert_id": "SPF-003",
+      "rule": "SPOOFING",
+      "severity": 92,
+      "trader": "T028",
+      "ticker": "TKR19",
+      "time": "14:02:30",
+      "explanation": "3 BUY orders totalling 54000 shares cancelled within seconds, then a 4000-share SELL filled 15s after the first order"
+    },
+    {
+      "alert_id": "FRN-002",
+      "rule": "FRONT_RUNNING",
+      "severity": 91,
+      "trader": "T024",
+      "ticker": "TKR14",
+      "time": "13:40:15",
+      "explanation": "Prop account sells 4000 TKR14 75s before a 30000-share client SELL order handled by the same trader"
+    },
+    {
+      "alert_id": "FRN-001",
+      "rule": "FRONT_RUNNING",
+      "severity": 90,
+      "trader": "T012",
+      "ticker": "TKR02",
+      "time": "11:10:00",
+      "explanation": "Prop account buys 5000 TKR02 60s before a 25000-share client BUY order handled by the same trader"
+    },
+    {
+      "alert_id": "FRN-003",
+      "rule": "FRONT_RUNNING",
+      "severity": 89,
+      "trader": "T033",
+      "ticker": "TKR24",
+      "time": "15:20:00",
+      "explanation": "Prop account buys 7500 TKR24 100s before a 22000-share client BUY order handled by the same trader"
+    },
+    {
+      "alert_id": "WSH-003",
+      "rule": "WASH_TRADE",
+      "severity": 83,
+      "trader": "T031",
+      "ticker": "TKR17",
+      "time": "13:05:02",
+      "explanation": "Bought and sold 9000 TKR17 28s apart between accounts with the same beneficial owner (BO_SHELL_1)"
+    },
+    {
+      "alert_id": "WSH-004",
+      "rule": "WASH_TRADE",
+      "severity": 83,
+      "trader": "T036",
+      "ticker": "TKR22",
+      "time": "14:20:02",
+      "explanation": "Bought and sold 7000 TKR22 43s apart between accounts with the same beneficial owner (BO_SHELL_2)"
+    },
+    {
+      "alert_id": "MTC-001",
+      "rule": "MARKING_THE_CLOSE",
+      "severity": 80,
+      "trader": "T020",
+      "ticker": "TKR07",
+      "time": "15:55:10",
+      "explanation": "Executed 81300 TKR07 in the last 5 minutes = 50.1% of closing volume"
+    },
+    {
+      "alert_id": "MTC-002",
+      "rule": "MARKING_THE_CLOSE",
+      "severity": 80,
+      "trader": "T038",
+      "ticker": "TKR13",
+      "time": "15:55:28",
+      "explanation": "Executed 76600 TKR13 in the last 5 minutes = 50.0% of closing volume"
+    },
+    {
+      "alert_id": "WSH-002",
+      "rule": "WASH_TRADE",
+      "severity": 76,
+      "trader": "T036",
+      "ticker": "TKR11",
+      "time": "11:42:11",
+      "explanation": "Bought and sold 6000 TKR11 29s apart between accounts with the same beneficial owner (BO_SHELL_2)"
+    },
+    {
+      "alert_id": "WSH-001",
+      "rule": "WASH_TRADE",
+      "severity": 73,
+      "trader": "T031",
+      "ticker": "TKR03",
+      "time": "10:15:00",
+      "explanation": "Bought and sold 8000 TKR03 22s apart between accounts with the same beneficial owner (BO_SHELL_1)"
+    }
+  ],
+  "noise": [
+    {
+      "rule": "WASH_TRADE",
+      "orders_scanned": 200055,
+      "alerts": 4
+    },
+    {
+      "rule": "SPOOFING",
+      "orders_scanned": 200055,
+      "alerts": 3
+    },
+    {
+      "rule": "FRONT_RUNNING",
+      "orders_scanned": 200055,
+      "alerts": 3
+    },
+    {
+      "rule": "MARKING_THE_CLOSE",
+      "orders_scanned": 200055,
+      "alerts": 2
+    }
+  ],
+  "case": [
+    {
+      "time": "12:31:10",
+      "event": "ORDER PLACED",
+      "side": "SELL",
+      "qty": 12000,
+      "price": 87.6,
+      "order_id": 900111
+    },
+    {
+      "time": "12:31:11.500",
+      "event": "ORDER PLACED",
+      "side": "SELL",
+      "qty": 12000,
+      "price": 87.61,
+      "order_id": 900112
+    },
+    {
+      "time": "12:31:13",
+      "event": "ORDER PLACED",
+      "side": "SELL",
+      "qty": 12000,
+      "price": 87.62,
+      "order_id": 900113
+    },
+    {
+      "time": "12:31:14.500",
+      "event": "ORDER PLACED",
+      "side": "SELL",
+      "qty": 12000,
+      "price": 87.63,
+      "order_id": 900114
+    },
+    {
+      "time": "12:31:16",
+      "event": "CANCELLED",
+      "side": "SELL",
+      "qty": 12000,
+      "price": 87.6,
+      "order_id": 900111
+    },
+    {
+      "time": "12:31:17",
+      "event": "CANCELLED",
+      "side": "SELL",
+      "qty": 12000,
+      "price": 87.61,
+      "order_id": 900112
+    },
+    {
+      "time": "12:31:18",
+      "event": "CANCELLED",
+      "side": "SELL",
+      "qty": 12000,
+      "price": 87.62,
+      "order_id": 900113
+    },
+    {
+      "time": "12:31:19",
+      "event": "CANCELLED",
+      "side": "SELL",
+      "qty": 12000,
+      "price": 87.63,
+      "order_id": 900114
+    },
+    {
+      "time": "12:31:21",
+      "event": "ORDER PLACED",
+      "side": "BUY",
+      "qty": 2500,
+      "price": 87.4,
+      "order_id": 900115
+    },
+    {
+      "time": "12:31:21.340",
+      "event": "FILLED",
+      "side": "BUY",
+      "qty": 2500,
+      "price": 87.4,
+      "order_id": 900115
+    }
+  ],
+  "dynamic": {
+    "before": {
+      "FRONT_RUNNING": 3,
+      "MARKING_THE_CLOSE": 2,
+      "WASH_TRADE": 4
+    },
+    "after": {
+      "FRONT_RUNNING": 3,
+      "MARKING_THE_CLOSE": 2,
+      "WASH_TRADE": 5
+    },
+    "history": [
+      {
+        "state": "SUCCEEDED",
+        "action": "FULL",
+        "trigger": "MANUAL"
+      },
+      {
+        "state": "SUCCEEDED",
+        "action": "FULL",
+        "trigger": "CREATION"
+      }
+    ]
+  },
+  "masking": {
+    "analyst": [
+      {
+        "ALERT_ID": "FRN-001",
+        "RULE": "FRONT_RUNNING",
+        "TRADER_ID": "T012",
+        "ACCOUNT_ID": "A0012 ahead of A0052",
+        "TICKER": "TKR02"
+      },
+      {
+        "ALERT_ID": "FRN-002",
+        "RULE": "FRONT_RUNNING",
+        "TRADER_ID": "T024",
+        "ACCOUNT_ID": "A0024 ahead of A0064",
+        "TICKER": "TKR14"
+      },
+      {
+        "ALERT_ID": "FRN-003",
+        "RULE": "FRONT_RUNNING",
+        "TRADER_ID": "T033",
+        "ACCOUNT_ID": "A0033 ahead of A0073",
+        "TICKER": "TKR24"
+      },
+      {
+        "ALERT_ID": "MTC-001",
+        "RULE": "MARKING_THE_CLOSE",
+        "TRADER_ID": "T020",
+        "ACCOUNT_ID": "A0020",
+        "TICKER": "TKR07"
+      },
+      {
+        "ALERT_ID": "MTC-002",
+        "RULE": "MARKING_THE_CLOSE",
+        "TRADER_ID": "T038",
+        "ACCOUNT_ID": "A0038",
+        "TICKER": "TKR13"
+      }
+    ],
+    "reviewer": [
+      {
+        "ALERT_ID": "FRN-001",
+        "RULE": "FRONT_RUNNING",
+        "TRADER_ID": "ID_821F84C7",
+        "ACCOUNT_ID": "ID_F30CEC99",
+        "TICKER": "TKR02"
+      },
+      {
+        "ALERT_ID": "FRN-002",
+        "RULE": "FRONT_RUNNING",
+        "TRADER_ID": "ID_39DF3C56",
+        "ACCOUNT_ID": "ID_7F280274",
+        "TICKER": "TKR14"
+      },
+      {
+        "ALERT_ID": "FRN-003",
+        "RULE": "FRONT_RUNNING",
+        "TRADER_ID": "ID_68FC8AC4",
+        "ACCOUNT_ID": "ID_79AE8464",
+        "TICKER": "TKR24"
+      },
+      {
+        "ALERT_ID": "MTC-001",
+        "RULE": "MARKING_THE_CLOSE",
+        "TRADER_ID": "ID_02414699",
+        "ACCOUNT_ID": "ID_F681C4D9",
+        "TICKER": "TKR07"
+      },
+      {
+        "ALERT_ID": "MTC-002",
+        "RULE": "MARKING_THE_CLOSE",
+        "TRADER_ID": "ID_45A22856",
+        "ACCOUNT_ID": "ID_A9ED343B",
+        "TICKER": "TKR13"
+      }
+    ]
+  }
+}

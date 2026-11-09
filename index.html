@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trade Surveillance in Snowflake — Snowflake Horizon Guide</title>
+  <meta name="description" content="Detect wash trading, spoofing, front-running and marking the close in SQL with MATCH_RECOGNIZE, window functions and Dynamic Tables." />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <!-- ────── Nav ────── -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">
+        <div class="nav-logo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        Trade Surveillance
+      </a>
+      <button class="nav-hamburger" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" role="list">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#orders">Data</a></li>
+        <li><a href="#wash">Rules</a></li>
+        <li><a href="#alerts">Alert Queue</a></li>
+        <li><a href="#dynamic">Live Alerts</a></li>
+        <li><a href="#masking">Reviewers</a></li>
+        <li><a href="#conclusion">Wrap-up</a></li>
+        <li><a href="https://github.com/sfc-gh-jacho/sfguide-trade-surveillance">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ────── Hero ────── -->
+  <header class="hero" id="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Financial Services · Capital Markets
+      </div>
+      <h1>Trade Surveillance in <span>Snowflake</span></h1>
+      <p>Find wash trades, spoofing, front-running and marking the close among 200,000 orders, in SQL, with an explanation for every alert.</p>
+      <div class="hero-ctas">
+        <a href="#overview" class="btn btn-primary">Start the Guide</a>
+        <a href="sql/trade_surveillance.sql" class="btn btn-ghost" download>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Full SQL
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-val">~25 min</div><div class="hero-stat-label">Time to Complete</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">200K</div><div class="hero-stat-label">Orders Scanned</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">4</div><div class="hero-stat-label">Detection Rules</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">12</div><div class="hero-stat-label">Alerts, 0 False Positives</div></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ────── Overview ────── -->
+    <section id="overview">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="section-label">Overview</div>
+          <h2>Needles in a Haystack of Orders</h2>
+          <p>A surveillance analyst at a fictional broker-dealer reviews a trading day of about 200,000 orders. A dozen of them form manipulative patterns. Here you build the rules that find them, entirely in SQL, so every alert can be traced back to the raw orders that caused it.</p>
+        </div>
+        <div class="pipeline reveal">
+          <div class="pipeline-card">
+            <div class="pipeline-step grad-1">A</div>
+            <h3>Wash trading</h3>
+            <p>Linked accounts trade with each other: volume without any real change in ownership.</p>
+          </div>
+          <div class="pipeline-card">
+            <div class="pipeline-step grad-2">B</div>
+            <h3>Spoofing</h3>
+            <p>Large orders placed and quickly cancelled to move the price, then a real trade on the other side.</p>
+          </div>
+          <div class="pipeline-card">
+            <div class="pipeline-step grad-3">C</div>
+            <h3>Front-running</h3>
+            <p>A trader's own account trades just ahead of a large client order they are handling.</p>
+          </div>
+          <div class="pipeline-card">
+            <div class="pipeline-step grad-4">D</div>
+            <h3>Marking the close</h3>
+            <p>One trader dominates volume in the final minutes to influence the closing price.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────── Prerequisites ────── -->
+    <section id="prereqs" class="bg-alt">
+      <div class="container narrow">
+        <div class="section-header reveal">
+          <div class="section-label">Prerequisites</div>
+          <h2>Before You Begin</h2>
+        </div>
+        <ul class="checklist reveal">
+          <li><strong>Any Snowflake edition</strong> for the detection steps. The optional reviewer masking step (12) needs <strong>Enterprise Edition</strong>.</li>
+          <li><strong>ACCOUNTADMIN</strong>, or <code>&lt;YOUR_ROLE&gt;</code> with CREATE DATABASE, CREATE WAREHOUSE and CREATE ROLE on the account.</li>
+          <li><strong>One Snowsight worksheet, run top to bottom.</strong> The script creates its own <code>SURV_DEMO_DB</code> database and <code>SURV_WH</code> warehouse and changes nothing else.</li>
+          <li><strong>A few minutes of XSMALL compute</strong>, a fraction of one credit for a full run.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ────── Steps ────── -->
+    <section id="setup">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">1</div><div><div class="section-label">Step 1</div><h2>Setup</h2></div></div>
+          <p>Create a dedicated database and an XSMALL warehouse that suspends after 60 seconds idle. Everything else in the guide lives inside these two objects, so cleanup is a single drop.</p>
+          <div class="code-wrap" data-step="setup"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="reference" class="bg-alt">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">2</div><div><div class="section-label">Step 2</div><h2>Traders, Accounts and Instruments</h2></div></div>
+          <p>This step sets up 40 traders, each with a proprietary (PROP) account, 84 client accounts and 25 fictional tickers. Four client accounts are quietly linked in pairs by a shared <em>beneficial owner</em>. That hidden relationship is exactly what wash-trade detection relies on.</p>
+          <div class="code-wrap" data-step="reference"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="orders">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">3</div><div><div class="section-label">Step 3</div><h2>One Day of Orders</h2></div></div>
+          <p>This step generates 200,000 orders between the open and the close, deterministically so every run is identical. The normal flow is designed to be clean: 100–2,000 shares per order, about 15% cancelled, and never cancelled within 30 seconds. Any alert you see later therefore comes from a planted case, not from noise.</p>
+          <div class="code-wrap" data-step="orders"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="plant" class="bg-alt">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">4</div><div><div class="section-label">Step 4</div><h2>Plant the Abusive Patterns</h2></div></div>
+          <p>Twelve cases are hidden among the normal orders: four wash trades, three spoofing bursts, three front-running cases and two attempts at marking the close. In real life you wouldn't know they're there, which is why you need rules. Below is what an analyst sees with no surveillance in place: 40 seconds of one ticker.</p>
+          <div class="code-wrap" data-step="plant"></div>
+          <h3 class="table-title">Before: the raw blotter, TKR05 at 10:47–10:48 <span class="real-badge">Real run output</span></h3>
+          <div class="results" data-results="blotter"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="wash">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">5</div><div><div class="section-label">Step 5 · Rule A</div><h2>Wash Trading</h2></div></div>
+          <p>The rule joins accounts that share a beneficial owner, then looks for a buy and a sell in the same ticker of similar size and price within 60 seconds. On the screen they look like two unrelated clients. In reality one owner is trading with themselves to create fake volume.</p>
+          <div class="code-wrap" data-step="wash"></div>
+          <h3 class="table-title">Alerts found <span class="real-badge">Real run output</span></h3>
+          <div class="results" data-results="rule" data-rule="WASH_TRADE"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="spoof" class="bg-alt">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">6</div><div><div class="section-label">Step 6 · Rule B</div><h2>Spoofing with MATCH_RECOGNIZE</h2></div></div>
+          <p>Spoofing is a <em>sequence</em>: three or more large orders on one side, each cancelled within 10 seconds, followed within 30 seconds by a fill on the opposite side. <code>MATCH_RECOGNIZE</code> describes that sequence as a pattern, like a regular expression over rows, and finds every match per account and ticker.</p>
+          <div class="callout">In <code>DEFINE</code>, use <code>LAG()</code> to look at the previous row. <code>PREV()</code> isn't available there, and conditions can't reference other pattern variables. That's why the pattern lists separate BUY and SELL variants.</div>
+          <div class="code-wrap" data-step="spoof"></div>
+          <h3 class="table-title">Alerts found <span class="real-badge">Real run output</span></h3>
+          <div class="results" data-results="rule" data-rule="SPOOFING"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="frontrun">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">7</div><div><div class="section-label">Step 7 · Rule C</div><h2>Front-running</h2></div></div>
+          <p>For every large client order (20,000+ shares), the rule looks back two minutes for fills in the <em>same trader's</em> PROP account, in the same ticker and direction. Each alert says exactly how much was traded and how many seconds ahead of the client.</p>
+          <div class="code-wrap" data-step="frontrun"></div>
+          <h3 class="table-title">Alerts found <span class="real-badge">Real run output</span></h3>
+          <div class="results" data-results="rule" data-rule="FRONT_RUNNING"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="close" class="bg-alt">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">8</div><div><div class="section-label">Step 8 · Rule D</div><h2>Marking the Close</h2></div></div>
+          <p>The rule aggregates executions in the final five minutes by trader and ticker, computes each trader's share of that ticker's volume with a window function, and uses <code>QUALIFY</code> to keep only traders above 20,000 shares <em>and</em> 30% of volume. That's two lines of filtering on top of one GROUP BY.</p>
+          <div class="code-wrap" data-step="close"></div>
+          <h3 class="table-title">Alerts found <span class="real-badge">Real run output</span></h3>
+          <div class="results" data-results="rule" data-rule="MARKING_THE_CLOSE"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="alerts">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">9</div><div><div class="section-label">Step 9</div><h2>The Consolidated Alert Queue</h2></div></div>
+          <p>One view unions the four rules into a single queue with a stable alert ID, a severity score and an explanation written for a human reviewer. All 200,000 orders reduce to 12 alerts, every planted case is caught, and none of the alerts comes from background noise.</p>
+          <div class="code-wrap" data-step="alerts"></div>
+          <h3 class="table-title">Signal vs. noise <span class="real-badge">Real run output</span></h3>
+          <div class="results" data-results="funnel"></div>
+          <h3 class="table-title">After: the alert queue, by severity <span class="real-badge">Real run output</span></h3>
+          <div class="results" data-results="queue"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="investigate" class="bg-alt">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">10</div><div><div class="section-label">Step 10</div><h2>Investigate One Case</h2></div></div>
+          <p>Alerts are only useful if an analyst can verify them. This query takes the top spoofing alert and rebuilds its exact timeline from the raw tables: four large sell orders stacked a cent apart, all cancelled within seconds, and the buy that filled just after.</p>
+          <div class="code-wrap" data-step="investigate"></div>
+          <h3 class="table-title">Case SPF-002: event timeline <span class="real-badge">Real run output</span></h3>
+          <div class="results" data-results="case"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dynamic">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">11</div><div><div class="section-label">Step 11</div><h2>Keep Alerts Fresh with a Dynamic Table</h2></div></div>
+          <p>A Dynamic Table materializes the alerts and refreshes itself within its target lag, here one minute, whenever new orders land. No task or scheduler is needed. The script then inserts a new wash trade, and the alert appears after the next refresh.</p>
+          <div class="callout warn-callout">Dynamic Tables don't support <code>MATCH_RECOGNIZE</code>. The live table covers the wash, front-running and marking-the-close rules, while spoofing runs on demand in the <code>SURV_ALERTS</code> view (or on a scheduled task). In this run both refreshes were <strong>FULL</strong>, not incremental, because of the joins and window functions in the rules. The step suspends the table at the end. Keep it suspended when you're not demoing.</div>
+          <div class="code-wrap" data-step="dynamic"></div>
+          <h3 class="table-title">New orders arrive <span class="real-badge">Real run output</span></h3>
+          <div class="results" data-results="dynamic"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="masking" class="bg-alt">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">12</div><div><div class="section-label">Step 12 · Optional · Enterprise</div><h2>Pseudonymized IDs for Reviewers</h2></div></div>
+          <p>A masking policy on the alert queue shows analysts the real trader and account IDs, while second-line reviewers see consistent hashed pseudonyms. Reviewers can still group and compare alerts by person without knowing who that person is until a case is escalated.</p>
+          <div class="code-wrap" data-step="masking"></div>
+          <h3 class="table-title">The same alerts, two roles <span class="real-badge">Real run output</span></h3>
+          <div class="results" data-results="masking"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cleanup">
+      <div class="container narrow">
+        <div class="step reveal">
+          <div class="step-head"><div class="deploy-num">13</div><div><div class="section-label">Step 13</div><h2>Clean Up</h2></div></div>
+          <p>Uncomment and run this block. Dropping the database removes the tables, views, Dynamic Table and masking policy together. The warehouse and the two optional roles are dropped separately.</p>
+          <div class="code-wrap" data-step="cleanup"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────── Conclusion ────── -->
+    <section id="conclusion" class="bg-alt">
+      <div class="container">
+        <div class="section-header reveal">
+          <div class="section-label">Wrap-up</div>
+          <h2>Key Takeaways</h2>
+          <p>You built four market-abuse rules, an explainable alert queue and an auto-refreshing alerts table, without moving data out of Snowflake.</p>
+        </div>
+        <div class="cortex-grid reveal">
+          <div class="cortex-card"><h3>Sequences in SQL</h3><p>MATCH_RECOGNIZE expresses patterns like spoofing as a regular expression over rows, with no procedural code.</p></div>
+          <div class="cortex-card"><h3>Explainable by design</h3><p>Every alert carries a plain-English reason and links back to the exact orders that triggered it.</p></div>
+          <div class="cortex-card"><h3>Fresh without pipelines</h3><p>A Dynamic Table keeps alerts current within a target lag, with no orchestration to build or maintain.</p></div>
+          <div class="cortex-card"><h3>Governed review</h3><p>Masking gives second-line reviewers pseudonyms instead of identities, enforced on the data itself.</p></div>
+        </div>
+        <div class="doc-links reveal">
+          <h3>Learn more in the Snowflake documentation</h3>
+          <div class="doc-grid">
+            <a href="https://docs.snowflake.com/en/sql-reference/constructs/match_recognize" target="_blank" rel="noopener">MATCH_RECOGNIZE →</a>
+            <a href="https://docs.snowflake.com/en/user-guide/match-recognize-introduction" target="_blank" rel="noopener">Identifying Sequences of Rows →</a>
+            <a href="https://docs.snowflake.com/en/sql-reference/constructs/qualify" target="_blank" rel="noopener">QUALIFY →</a>
+            <a href="https://docs.snowflake.com/en/user-guide/dynamic-tables-about" target="_blank" rel="noopener">Dynamic Tables →</a>
+            <a href="https://docs.snowflake.com/en/user-guide/security-column-ddm-intro" target="_blank" rel="noopener">Dynamic Data Masking →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ────── Footer ────── -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-col">
+          <h4>Guide</h4>
+          <a href="#overview">Overview</a>
+          <a href="#spoof">Spoofing Rule</a>
+          <a href="#alerts">Alert Queue</a>
+          <a href="#dynamic">Live Alerts</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="sql/trade_surveillance.sql" download>Download SQL</a>
+          <a href="https://github.com/sfc-gh-jacho/sfguide-trade-surveillance">GitHub Repository</a>
+          <a href="https://docs.snowflake.com/en/user-guide/match-recognize-introduction" target="_blank" rel="noopener">Sequence Detection Docs</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-disclaimer">All traders, accounts, tickers (TKR01–TKR25) and trades are synthetic. The rules, thresholds and severity scores are illustrative. They are not production surveillance logic or regulatory guidance. This site has no connection to any Snowflake account.</p>
+        <span class="snow-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="22"/><line x1="3.3" y1="7" x2="20.7" y2="17"/><line x1="3.3" y1="17" x2="20.7" y2="7"/></svg>
+          Built on Snowflake Horizon
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-sql.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
